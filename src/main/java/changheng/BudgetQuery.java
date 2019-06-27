@@ -23,10 +23,7 @@ public class BudgetQuery {
         double result = getAmountOfPeriod(from, lastDay(from), budgets);
 
         for (LocalDate current = firstDayOfNextMonth(from); current.isBefore(to) && !isSameYearMonth(current, to); current = current.plusMonths(1)) {
-            List<Budget> queryResult = query(current, lastDay(current), budgets);
-            for (Budget budget : queryResult) {
-                result += budget.getAmount();
-            }
+            result += getAmountOfPeriod(current, lastDay(current), budgets);
         }
 
         // calc last month
