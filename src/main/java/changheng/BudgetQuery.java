@@ -25,10 +25,6 @@ public class BudgetQuery {
         return YearMonth.from(d).atDay(1);
     }
 
-    private LocalDate firstDayOfNextMonth(LocalDate current) {
-        return YearMonth.from(current.plusMonths(1)).atDay(1);
-    }
-
     private Double getAmountOfPeriod(Period period, List<Budget> budgets) {
         double total = 0;
         for (Budget budget : budgets) {
@@ -48,10 +44,6 @@ public class BudgetQuery {
     }
 
     private Double queryTotalAmount(Period period, List<Budget> budgets) {
-        if (period.isSameYearMonth()) {
-            return getAmountOfPeriod(period, budgets);
-        }
-
         double result = 0;
 
         for (LocalDate current = firstDay(period.getStart()); (current.isBefore(period.getEnd()) || current.equals(period.getEnd())); current = current.plusMonths(1)) {
