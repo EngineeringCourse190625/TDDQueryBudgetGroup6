@@ -1,7 +1,6 @@
 package changheng;
 
 import java.time.LocalDate;
-import java.time.YearMonth;
 
 public class Period {
     private final LocalDate start;
@@ -12,19 +11,16 @@ public class Period {
         this.end = end;
     }
 
-    public LocalDate getStart() {
-        return start;
+    public int getOverlappingDays(Period another) {
+        LocalDate overlappingStart = start.isAfter(another.start) ? start : another.start;
+        LocalDate overlappingEnd = end.isBefore(another.end) ? end : another.end;
+        if (overlappingEnd.isBefore(overlappingStart)) {
+            return 0;
+        }
+        return new Period(overlappingStart, overlappingEnd).intervalDays();
     }
 
-    public LocalDate getEnd() {
-        return end;
-    }
-
-    public boolean isSameYearMonth() {
-        return YearMonth.from(start).equals(YearMonth.from(end));
-    }
-
-    public int intervalDays() {
+    private int intervalDays() {
         return java.time.Period.between(start, end).getDays() + 1;
     }
 }

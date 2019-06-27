@@ -20,20 +20,11 @@ public class BudgetQuery {
         return Arrays.asList(a, b);
     }
 
-    private int getOverlappingDays(Period period, Budget budget) {
-        LocalDate overlappingStart = period.getStart().isAfter(budget.firstDay()) ? period.getStart() : budget.firstDay();
-        LocalDate overlappingEnd = period.getEnd().isBefore(budget.lastDay()) ? period.getEnd() : budget.lastDay();
-        if (overlappingEnd.isBefore(overlappingStart)) {
-            return 0;
-        }
-        return new Period(overlappingStart, overlappingEnd).intervalDays();
-    }
-
     private Double queryTotalAmount(Period period, List<Budget> budgets) {
         double result = 0;
 
         for (Budget budget : budgets) {
-            result += budget.dailyAmount() * getOverlappingDays(period, budget);
+            result += budget.dailyAmount() * period.getOverlappingDays(new Period(budget.firstDay(), budget.lastDay()));
         }
 
         return result;
