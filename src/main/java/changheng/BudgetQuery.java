@@ -15,20 +15,13 @@ public class BudgetQuery {
             throw new IllegalArgumentException("Invalid date range");
         }
 
-        double result = 0;
         if (isSameYearMonth(from, to)) {
-            List<Budget> queryResult = query(firstDay(from), to, budgets);
-            for (Budget budget : queryResult) {
-                result += budget.dailyAmount() * intervalDays(from, to);
-            }
-            return result;
+            return getAmountOfPeriod(from, to, budgets);
         }
 
         // calc first month
-        List<Budget> queryResult = query(firstDay(from), lastDay(from), budgets);
-        for (Budget budget : queryResult) {
-            result += budget.dailyAmount() * intervalDays(from, lastDay(from));
-        }
+        double result = getAmountOfPeriod(from, lastDay(from), budgets);
+        List<Budget> queryResult;
 
         from = from.plusMonths(1);
         from = LocalDate.of(from.getYear(), from.getMonthValue(), 1);
@@ -57,6 +50,15 @@ public class BudgetQuery {
 
     private LocalDate firstDay(LocalDate d) {
         return YearMonth.from(d).atDay(1);
+    }
+
+    private double getAmountOfPeriod(LocalDate from, LocalDate to, List<Budget> budgets) {
+        double total = 0;
+        List<Budget> queryResult = query(firstDay(from), to, budgets);
+        for (Budget budget : queryResult) {
+            total += budget.dailyAmount() * intervalDays(from, to);
+        }
+        return total;
     }
 
     private int getMonthLength(LocalDate date) {
