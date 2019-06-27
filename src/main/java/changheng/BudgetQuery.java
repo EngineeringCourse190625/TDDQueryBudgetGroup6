@@ -1,7 +1,6 @@
 package changheng;
 
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.YearMonth;
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +14,7 @@ public class BudgetQuery {
             throw new IllegalArgumentException("Invalid date range");
         }
 
-        return queryTotalAmount(from, to, budgets);
+        return queryTotalAmount(new Period(from, to), budgets);
     }
 
     protected List<Budget> getAllBudgets() {
@@ -42,7 +41,7 @@ public class BudgetQuery {
     }
 
     private int intervalDays(LocalDate from, LocalDate to) {
-        return Period.between(from, to).getDays() + 1;
+        return java.time.Period.between(from, to).getDays() + 1;
     }
 
     private boolean isInPeriod(LocalDate from, LocalDate to, LocalDate d) {
@@ -63,20 +62,20 @@ public class BudgetQuery {
                 collect(toList());
     }
 
-    private Double queryTotalAmount(LocalDate from, LocalDate to, List<Budget> budgets) {
-        if (isSameYearMonth(from, to)) {
-            return getAmountOfPeriod(from, to, budgets);
+    private Double queryTotalAmount(Period period, List<Budget> budgets) {
+        if (isSameYearMonth(period.getFrom(), period.getTo())) {
+            return getAmountOfPeriod(period.getFrom(), period.getTo(), budgets);
         }
 
         // calc first month
-        double result = getAmountOfPeriod(from, lastDay(from), budgets);
+        double result = getAmountOfPeriod(period.getFrom(), lastDay(period.getFrom()), budgets);
 
-        for (LocalDate current = firstDayOfNextMonth(from); current.isBefore(to) && !isSameYearMonth(current, to); current = current.plusMonths(1)) {
+        for (LocalDate current = firstDayOfNextMonth(period.getFrom()); current.isBefore(period.getTo()) && !isSameYearMonth(current, period.getTo()); current = current.plusMonths(1)) {
             result += getAmountOfPeriod(current, lastDay(current), budgets);
         }
 
         // calc last month
-        result += getAmountOfPeriod(firstDay(to), to, budgets);
+        result += getAmountOfPeriod(firstDay(period.getTo()), period.getTo(), budgets);
         return result;
     }
 }
