@@ -5,8 +5,6 @@ import java.time.YearMonth;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
 public class BudgetQuery {
     public Double query(LocalDate from, LocalDate to) {
         List<Budget> budgets = getAllBudgets();
@@ -33,9 +31,10 @@ public class BudgetQuery {
 
     private Double getAmountOfPeriod(Period period, List<Budget> budgets) {
         double total = 0;
-        List<Budget> queryResult = query(firstDay(period.getStart()), period.getEnd(), budgets);
-        for (Budget budget : queryResult) {
-            total += budget.dailyAmount() * period.intervalDays();
+        for (Budget budget : budgets) {
+            if (isInPeriod(firstDay(period.getStart()), period.getEnd(), budget.firstDay())) {
+                total += budget.dailyAmount() * period.intervalDays();
+            }
         }
         return total;
     }
@@ -46,12 +45,6 @@ public class BudgetQuery {
 
     private LocalDate lastDay(LocalDate d) {
         return YearMonth.from(d).atEndOfMonth();
-    }
-
-    private List<Budget> query(LocalDate from, LocalDate to, List<Budget> budgets) {
-        return budgets.stream().
-                filter(budget -> isInPeriod(from, to, budget.firstDay())).
-                collect(toList());
     }
 
     private Double queryTotalAmount(Period period, List<Budget> budgets) {
