@@ -24,7 +24,7 @@ public class BudgetQuery {
         double result = 0;
 
         for (Budget budget : budgets) {
-            result += budget.dailyAmount() * period.getOverlappingDays(new Period(budget.firstDay(), budget.lastDay()));
+            result += budget.dailyAmount() * period.getOverlappingDays(budget.getPeriod());
         }
 
         return result;
