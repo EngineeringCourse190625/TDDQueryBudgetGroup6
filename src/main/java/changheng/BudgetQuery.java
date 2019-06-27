@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class BudgetQuery {
     public Double query(LocalDate from, LocalDate to) {
@@ -55,7 +56,21 @@ public class BudgetQuery {
             if (YearMonth.from(period.getEnd()).equals(YearMonth.from(current))) {
                 overlappingEnd = period.getEnd();
             }
-            result += getAmountOfPeriod(new Period(overlappingStart, overlappingEnd), budgets);
+            Period overlappingPeriod = new Period(overlappingStart, overlappingEnd);
+
+            YearMonth currentMonth = YearMonth.from(current);
+            Optional<Budget> optionalBudget = budgets.stream().
+                    filter(b -> currentMonth.equals(YearMonth.from(b.firstDay()))).
+                    findFirst();
+            if (!optionalBudget.isPresent()) {
+                continue;
+            }
+
+            double total = 0;
+            if (isInPeriod(firstDay(overlappingPeriod.getStart()), overlappingPeriod.getEnd(), optionalBudget.get().firstDay())) {
+                total += optionalBudget.get().dailyAmount() * overlappingPeriod.intervalDays();
+            }
+            result += total;
         }
 
         return result;
