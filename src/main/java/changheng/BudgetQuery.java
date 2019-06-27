@@ -32,6 +32,18 @@ public class BudgetQuery {
         return YearMonth.from(d).atDay(1);
     }
 
+    private Period getOverlappingPeriod(Period period, LocalDate current) {
+        LocalDate overlappingStart = current;
+        if (YearMonth.from(period.getStart()).equals(YearMonth.from(current))) {
+            overlappingStart = period.getStart();
+        }
+        LocalDate overlappingEnd = lastDay(current);
+        if (YearMonth.from(period.getEnd()).equals(YearMonth.from(current))) {
+            overlappingEnd = period.getEnd();
+        }
+        return new Period(overlappingStart, overlappingEnd);
+    }
+
     private LocalDate lastDay(LocalDate d) {
         return YearMonth.from(d).atEndOfMonth();
     }
@@ -40,23 +52,13 @@ public class BudgetQuery {
         double result = 0;
 
         for (LocalDate current = firstDay(period.getStart()); (current.isBefore(period.getEnd()) || current.equals(period.getEnd())); current = current.plusMonths(1)) {
-            LocalDate overlappingStart = current;
-            if (YearMonth.from(period.getStart()).equals(YearMonth.from(current))) {
-                overlappingStart = period.getStart();
-            }
-            LocalDate overlappingEnd = lastDay(current);
-            if (YearMonth.from(period.getEnd()).equals(YearMonth.from(current))) {
-                overlappingEnd = period.getEnd();
-            }
-            Period overlappingPeriod = new Period(overlappingStart, overlappingEnd);
-
             YearMonth currentMonth = YearMonth.from(current);
             Optional<Budget> currentBudget = currentBudget(budgets, currentMonth);
             if (!currentBudget.isPresent()) {
                 continue;
             }
 
-            result += currentBudget.get().dailyAmount() * overlappingPeriod.intervalDays();
+            result += currentBudget.get().dailyAmount() * getOverlappingPeriod(period, current).intervalDays();
         }
 
         return result;
