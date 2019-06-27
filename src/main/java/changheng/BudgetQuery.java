@@ -15,20 +15,7 @@ public class BudgetQuery {
             throw new IllegalArgumentException("Invalid date range");
         }
 
-        if (isSameYearMonth(from, to)) {
-            return getAmountOfPeriod(from, to, budgets);
-        }
-
-        // calc first month
-        double result = getAmountOfPeriod(from, lastDay(from), budgets);
-
-        for (LocalDate current = firstDayOfNextMonth(from); current.isBefore(to) && !isSameYearMonth(current, to); current = current.plusMonths(1)) {
-            result += getAmountOfPeriod(current, lastDay(current), budgets);
-        }
-
-        // calc last month
-        result += getAmountOfPeriod(firstDay(to), to, budgets);
-        return result;
+        return queryTotalAmount(from, to, budgets);
     }
 
     protected List<Budget> getAllBudgets() {
@@ -74,5 +61,22 @@ public class BudgetQuery {
         return budgets.stream().
                 filter(budget -> isInPeriod(from, to, budget.firstDay())).
                 collect(toList());
+    }
+
+    private Double queryTotalAmount(LocalDate from, LocalDate to, List<Budget> budgets) {
+        if (isSameYearMonth(from, to)) {
+            return getAmountOfPeriod(from, to, budgets);
+        }
+
+        // calc first month
+        double result = getAmountOfPeriod(from, lastDay(from), budgets);
+
+        for (LocalDate current = firstDayOfNextMonth(from); current.isBefore(to) && !isSameYearMonth(current, to); current = current.plusMonths(1)) {
+            result += getAmountOfPeriod(current, lastDay(current), budgets);
+        }
+
+        // calc last month
+        result += getAmountOfPeriod(firstDay(to), to, budgets);
+        return result;
     }
 }
