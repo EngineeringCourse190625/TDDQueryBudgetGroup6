@@ -27,11 +27,7 @@ public class BudgetQuery {
         }
 
         // calc last month
-        int diff1 = to.getDayOfMonth();
-        List<Budget> queryResult = query(LocalDate.of(to.getYear(), to.getMonthValue(), 1), lastDay(to), budgets);
-        for (Budget budget : queryResult) {
-            result += budget.getAmount() / getMonthLength(to) * diff1;
-        }
+        result += getAmountOfPeriod(firstDay(to), to, budgets);
         return result;
     }
 
