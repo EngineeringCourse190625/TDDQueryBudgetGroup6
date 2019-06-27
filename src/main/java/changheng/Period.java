@@ -1,21 +1,26 @@
 package changheng;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 
 public class Period {
-    private final LocalDate from;
-    private final LocalDate to;
+    private final LocalDate start;
+    private final LocalDate end;
 
-    public Period(LocalDate from, LocalDate to) {
-        this.from = from;
-        this.to = to;
+    public Period(LocalDate start, LocalDate end) {
+        this.start = start;
+        this.end = end;
     }
 
-    public LocalDate getFrom() {
-        return from;
+    public LocalDate getStart() {
+        return start;
     }
 
-    public LocalDate getTo() {
-        return to;
+    public LocalDate getEnd() {
+        return end;
+    }
+
+    public boolean isSameYearMonth() {
+        return YearMonth.from(start).equals(YearMonth.from(end));
     }
 }

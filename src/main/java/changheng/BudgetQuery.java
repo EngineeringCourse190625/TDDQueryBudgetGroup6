@@ -48,10 +48,6 @@ public class BudgetQuery {
         return (d.isAfter(from) || d.isEqual(from)) && (d.isBefore(to) || d.isEqual(to));
     }
 
-    private boolean isSameYearMonth(LocalDate from, LocalDate to) {
-        return YearMonth.from(from).equals(YearMonth.from(to));
-    }
-
     private LocalDate lastDay(LocalDate d) {
         return YearMonth.from(d).atEndOfMonth();
     }
@@ -63,19 +59,19 @@ public class BudgetQuery {
     }
 
     private Double queryTotalAmount(Period period, List<Budget> budgets) {
-        if (isSameYearMonth(period.getFrom(), period.getTo())) {
-            return getAmountOfPeriod(period.getFrom(), period.getTo(), budgets);
+        if (new Period(period.getStart(), period.getEnd()).isSameYearMonth()) {
+            return getAmountOfPeriod(period.getStart(), period.getEnd(), budgets);
         }
 
         // calc first month
-        double result = getAmountOfPeriod(period.getFrom(), lastDay(period.getFrom()), budgets);
+        double result = getAmountOfPeriod(period.getStart(), lastDay(period.getStart()), budgets);
 
-        for (LocalDate current = firstDayOfNextMonth(period.getFrom()); current.isBefore(period.getTo()) && !isSameYearMonth(current, period.getTo()); current = current.plusMonths(1)) {
+        for (LocalDate current = firstDayOfNextMonth(period.getStart()); current.isBefore(period.getEnd()) && !new Period(current, period.getEnd()).isSameYearMonth(); current = current.plusMonths(1)) {
             result += getAmountOfPeriod(current, lastDay(current), budgets);
         }
 
         // calc last month
-        result += getAmountOfPeriod(firstDay(period.getTo()), period.getTo(), budgets);
+        result += getAmountOfPeriod(firstDay(period.getEnd()), period.getEnd(), budgets);
         return result;
     }
 }
