@@ -54,16 +54,18 @@ public class BudgetQuery {
 
         double result = 0;
 
-        for (LocalDate current = firstDay(period.getStart()); current.isBefore(period.getEnd()) && !new Period(current, period.getEnd()).isSameYearMonth(); current = current.plusMonths(1)) {
+        for (LocalDate current = firstDay(period.getStart()); (current.isBefore(period.getEnd()) || current.equals(period.getEnd())); current = current.plusMonths(1)) {
             LocalDate overlappingStart = current;
             if (YearMonth.from(period.getStart()).equals(YearMonth.from(current))) {
                 overlappingStart = period.getStart();
             }
-            result += getAmountOfPeriod(new Period(overlappingStart, lastDay(current)), budgets);
+            LocalDate overlappingEnd = lastDay(current);
+            if (YearMonth.from(period.getEnd()).equals(YearMonth.from(current))) {
+                overlappingEnd = period.getEnd();
+            }
+            result += getAmountOfPeriod(new Period(overlappingStart, overlappingEnd), budgets);
         }
 
-        // calc last month
-        result += getAmountOfPeriod(new Period(firstDay(period.getEnd()), period.getEnd()), budgets);
         return result;
     }
 }
