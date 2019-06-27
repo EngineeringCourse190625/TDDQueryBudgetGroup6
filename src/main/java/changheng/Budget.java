@@ -1,6 +1,8 @@
 package changheng;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 
 public class Budget {
     private String date; // yyyy/MM
@@ -41,5 +43,9 @@ public class Budget {
 
     public double dailyAmount() {
         return amount / firstDay().lengthOfMonth();
+    }
+
+    public LocalDate lastDay() {
+        return YearMonth.parse(date, DateTimeFormatter.ofPattern("yyyy/MM")).atEndOfMonth();
     }
 }

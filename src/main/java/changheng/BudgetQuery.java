@@ -1,7 +1,6 @@
 package changheng;
 
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,24 +20,20 @@ public class BudgetQuery {
         return Arrays.asList(a, b);
     }
 
-    private int getOverlappingDays(Period period, LocalDate budgetFirstDay) {
-        LocalDate overlappingStart = period.getStart().isAfter(budgetFirstDay) ? period.getStart() : budgetFirstDay;
-        LocalDate overlappingEnd = period.getEnd().isBefore(lastDay(budgetFirstDay)) ? period.getEnd() : lastDay(budgetFirstDay);
+    private int getOverlappingDays(Period period, Budget budget) {
+        LocalDate overlappingStart = period.getStart().isAfter(budget.firstDay()) ? period.getStart() : budget.firstDay();
+        LocalDate overlappingEnd = period.getEnd().isBefore(budget.lastDay()) ? period.getEnd() : budget.lastDay();
         if (overlappingEnd.isBefore(overlappingStart)) {
             return 0;
         }
         return new Period(overlappingStart, overlappingEnd).intervalDays();
     }
 
-    private LocalDate lastDay(LocalDate d) {
-        return YearMonth.from(d).atEndOfMonth();
-    }
-
     private Double queryTotalAmount(Period period, List<Budget> budgets) {
         double result = 0;
 
         for (Budget budget : budgets) {
-            result += budget.dailyAmount() * getOverlappingDays(period, budget.firstDay());
+            result += budget.dailyAmount() * getOverlappingDays(period, budget);
         }
 
         return result;
