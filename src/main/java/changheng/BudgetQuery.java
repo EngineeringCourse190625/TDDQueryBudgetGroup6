@@ -31,11 +31,11 @@ public class BudgetQuery {
         return YearMonth.from(current.plusMonths(1)).atDay(1);
     }
 
-    private double getAmountOfPeriod(LocalDate from, LocalDate to, List<Budget> budgets) {
+    private Double getAmountOfPeriod(Period period, List<Budget> budgets) {
         double total = 0;
-        List<Budget> queryResult = query(firstDay(from), to, budgets);
+        List<Budget> queryResult = query(firstDay(period.getStart()), period.getEnd(), budgets);
         for (Budget budget : queryResult) {
-            total += budget.dailyAmount() * intervalDays(from, to);
+            total += budget.dailyAmount() * intervalDays(period.getStart(), period.getEnd());
         }
         return total;
     }
@@ -59,19 +59,19 @@ public class BudgetQuery {
     }
 
     private Double queryTotalAmount(Period period, List<Budget> budgets) {
-        if (new Period(period.getStart(), period.getEnd()).isSameYearMonth()) {
-            return getAmountOfPeriod(period.getStart(), period.getEnd(), budgets);
+        if (period.isSameYearMonth()) {
+            return getAmountOfPeriod(period, budgets);
         }
 
         // calc first month
-        double result = getAmountOfPeriod(period.getStart(), lastDay(period.getStart()), budgets);
+        double result = getAmountOfPeriod(new Period(period.getStart(), lastDay(period.getStart())), budgets);
 
         for (LocalDate current = firstDayOfNextMonth(period.getStart()); current.isBefore(period.getEnd()) && !new Period(current, period.getEnd()).isSameYearMonth(); current = current.plusMonths(1)) {
-            result += getAmountOfPeriod(current, lastDay(current), budgets);
+            result += getAmountOfPeriod(new Period(current, lastDay(current)), budgets);
         }
 
         // calc last month
-        result += getAmountOfPeriod(firstDay(period.getEnd()), period.getEnd(), budgets);
+        result += getAmountOfPeriod(new Period(firstDay(period.getEnd()), period.getEnd()), budgets);
         return result;
     }
 }
