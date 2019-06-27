@@ -54,10 +54,6 @@ public class BudgetQuery {
         return total;
     }
 
-    private int getMonthLength(LocalDate date) {
-        return date.lengthOfMonth();
-    }
-
     private int intervalDays(LocalDate from, LocalDate to) {
         return Period.between(from, to).getDays() + 1;
     }
