@@ -38,4 +38,8 @@ public class Budget {
     public LocalDate firstDay() {
         return LocalDate.of(getYear(), getMonth(), 1);
     }
+
+    public double dailyAmount() {
+        return amount / firstDay().lengthOfMonth();
+    }
 }

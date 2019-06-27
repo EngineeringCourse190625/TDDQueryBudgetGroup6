@@ -19,7 +19,7 @@ public class BudgetQuery {
         if (isSameYearMonth(from, to)) {
             List<Budget> queryResult = query(firstDay(from), lastDay(to), budgets);
             for (Budget budget : queryResult) {
-                result += budget.getAmount() / budget.firstDay().lengthOfMonth() * intervalDays(from, to);
+                result += budget.dailyAmount() * intervalDays(from, to);
             }
             return result;
         }
@@ -30,6 +30,7 @@ public class BudgetQuery {
         for (Budget budget : queryResult) {
             result += budget.getAmount() / getMonthLength(from) * diff;
         }
+
         from = from.plusMonths(1);
         from = LocalDate.of(from.getYear(), from.getMonthValue(), 1);
 
