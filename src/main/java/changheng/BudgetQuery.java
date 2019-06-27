@@ -21,12 +21,8 @@ public class BudgetQuery {
     }
 
     private Double queryTotalAmount(Period period, List<Budget> budgets) {
-        double result = 0;
-
-        for (Budget budget : budgets) {
-            result += budget.dailyAmount() * period.getOverlappingDays(budget.getPeriod());
-        }
-
-        return result;
+        return budgets.stream().
+                mapToDouble(budget -> budget.getOverlappingAmount(period)).
+                sum();
     }
 }

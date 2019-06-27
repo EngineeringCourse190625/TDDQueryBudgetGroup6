@@ -13,19 +13,27 @@ public class Budget {
         this.amount = amount;
     }
 
-    public double dailyAmount() {
-        return amount / firstDay().lengthOfMonth();
+    public double getOverlappingAmount(Period period) {
+        return dailyAmount() * period.getOverlappingDays(getPeriod());
     }
 
-    public Period getPeriod() {
-        return new Period(firstDay(), lastDay());
+    private double dailyAmount() {
+        return amount / yearMonth().lengthOfMonth();
     }
 
     private LocalDate firstDay() {
-        return YearMonth.parse(date, DateTimeFormatter.ofPattern("yyyy/MM")).atDay(1);
+        return yearMonth().atDay(1);
+    }
+
+    private Period getPeriod() {
+        return new Period(firstDay(), lastDay());
     }
 
     private LocalDate lastDay() {
-        return YearMonth.parse(date, DateTimeFormatter.ofPattern("yyyy/MM")).atEndOfMonth();
+        return yearMonth().atEndOfMonth();
+    }
+
+    private YearMonth yearMonth() {
+        return YearMonth.parse(date, DateTimeFormatter.ofPattern("yyyy/MM"));
     }
 }
