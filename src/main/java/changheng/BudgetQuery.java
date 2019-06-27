@@ -5,7 +5,8 @@ import java.time.Period;
 import java.time.YearMonth;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 public class BudgetQuery {
     public Double query(LocalDate from, LocalDate to) {
@@ -65,6 +66,10 @@ public class BudgetQuery {
         return Period.between(from, to).getDays() + 1;
     }
 
+    private boolean isInPeriod(LocalDate from, LocalDate to, LocalDate d) {
+        return (d.isAfter(from) || d.isEqual(from)) && (d.isBefore(to) || d.isEqual(to));
+    }
+
     private boolean isSameYearMonth(LocalDate from, LocalDate to) {
         return YearMonth.from(from).equals(YearMonth.from(to));
     }
@@ -73,10 +78,9 @@ public class BudgetQuery {
         return YearMonth.from(d).atEndOfMonth();
     }
 
-    private List<Budget> query(LocalDate from, LocalDate to, List<Budget> budgetList) {
-        return budgetList.stream().filter(budget -> {
-            LocalDate d = budget.getLocalDate();
-            return (d.isAfter(from) || d.isEqual(from)) && (d.isBefore(to) || d.isEqual(to));
-        }).collect(Collectors.toList());
+    private List<Budget> query(LocalDate from, LocalDate to, List<Budget> budgets) {
+        return budgets.stream().
+                filter(budget -> isInPeriod(from, to, budget.firstDay())).
+                collect(toList());
     }
 }

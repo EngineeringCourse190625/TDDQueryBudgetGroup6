@@ -35,7 +35,7 @@ public class Budget {
         return Integer.valueOf(date.substring(6));
     }
 
-    public LocalDate getLocalDate() {
+    public LocalDate firstDay() {
         return LocalDate.of(getYear(), getMonth(), 1);
     }
 }
