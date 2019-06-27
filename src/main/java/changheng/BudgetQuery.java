@@ -22,6 +22,12 @@ public class BudgetQuery {
         return Arrays.asList(a, b);
     }
 
+    private Optional<Budget> currentBudget(List<Budget> budgets, YearMonth currentMonth) {
+        return budgets.stream().
+                filter(b -> currentMonth.equals(YearMonth.from(b.firstDay()))).
+                findFirst();
+    }
+
     private LocalDate firstDay(LocalDate d) {
         return YearMonth.from(d).atDay(1);
     }
@@ -45,16 +51,12 @@ public class BudgetQuery {
             Period overlappingPeriod = new Period(overlappingStart, overlappingEnd);
 
             YearMonth currentMonth = YearMonth.from(current);
-            Optional<Budget> optionalBudget = budgets.stream().
-                    filter(b -> currentMonth.equals(YearMonth.from(b.firstDay()))).
-                    findFirst();
-            if (!optionalBudget.isPresent()) {
+            Optional<Budget> currentBudget = currentBudget(budgets, currentMonth);
+            if (!currentBudget.isPresent()) {
                 continue;
             }
 
-            double total = 0;
-            total += optionalBudget.get().dailyAmount() * overlappingPeriod.intervalDays();
-            result += total;
+            result += currentBudget.get().dailyAmount() * overlappingPeriod.intervalDays();
         }
 
         return result;
