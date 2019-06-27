@@ -16,7 +16,7 @@ public class BudgetQuery {
 
         double result = 0;
         if (isSameYearMonth(from, to)) {
-            List<Budget> queryResult = query(getBeginDayDate(from), getEndDayDate(to), budgets);
+            List<Budget> queryResult = query(firstDay(from), lastDay(to), budgets);
             for (Budget budget : queryResult) {
                 result += budget.getAmount() / getMonthLength(from) * intervalDays(from, to);
             }
@@ -25,7 +25,7 @@ public class BudgetQuery {
 
         // calc first month
         int diff = getMonthLength(from) - from.getDayOfMonth() + 1;
-        List<Budget> queryResult = query(getBeginDayDate(from), getEndDayDate(from), budgets);
+        List<Budget> queryResult = query(firstDay(from), lastDay(from), budgets);
         for (Budget budget : queryResult) {
             result += budget.getAmount() / getMonthLength(from) * diff;
         }
@@ -33,14 +33,14 @@ public class BudgetQuery {
         from = LocalDate.of(from.getYear(), from.getMonthValue(), 1);
 
         for (LocalDate now = from; now.isBefore(to) && !isSameYearMonth(now, to); now = now.plusMonths(1)) {
-            queryResult = query(now, getEndDayDate(now), budgets);
+            queryResult = query(now, lastDay(now), budgets);
             for (Budget budget : queryResult) {
                 result += budget.getAmount();
             }
         }
         // calc last month
         diff = to.getDayOfMonth();
-        queryResult = query(LocalDate.of(to.getYear(), to.getMonthValue(), 1), getEndDayDate(to), budgets);
+        queryResult = query(LocalDate.of(to.getYear(), to.getMonthValue(), 1), lastDay(to), budgets);
         for (Budget budget : queryResult) {
             result += budget.getAmount() / getMonthLength(to) * diff;
         }
@@ -53,12 +53,8 @@ public class BudgetQuery {
         return Arrays.asList(a, b);
     }
 
-    private LocalDate getBeginDayDate(LocalDate d) {
-        return LocalDate.of(d.getYear(), d.getMonthValue(), 1);
-    }
-
-    private LocalDate getEndDayDate(LocalDate d) {
-        return LocalDate.of(d.getYear(), d.getMonthValue(), getMonthLength(d));
+    private LocalDate firstDay(LocalDate d) {
+        return YearMonth.from(d).atDay(1);
     }
 
     private int getMonthLength(LocalDate date) {
@@ -71,6 +67,10 @@ public class BudgetQuery {
 
     private boolean isSameYearMonth(LocalDate from, LocalDate to) {
         return YearMonth.from(from).equals(YearMonth.from(to));
+    }
+
+    private LocalDate lastDay(LocalDate d) {
+        return YearMonth.from(d).atEndOfMonth();
     }
 
     private List<Budget> query(LocalDate from, LocalDate to, List<Budget> budgetList) {
