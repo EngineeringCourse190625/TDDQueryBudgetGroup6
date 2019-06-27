@@ -35,13 +35,9 @@ public class BudgetQuery {
         double total = 0;
         List<Budget> queryResult = query(firstDay(period.getStart()), period.getEnd(), budgets);
         for (Budget budget : queryResult) {
-            total += budget.dailyAmount() * intervalDays(period.getStart(), period.getEnd());
+            total += budget.dailyAmount() * period.intervalDays();
         }
         return total;
-    }
-
-    private int intervalDays(LocalDate from, LocalDate to) {
-        return java.time.Period.between(from, to).getDays() + 1;
     }
 
     private boolean isInPeriod(LocalDate from, LocalDate to, LocalDate d) {

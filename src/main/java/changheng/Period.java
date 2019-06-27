@@ -23,4 +23,8 @@ public class Period {
     public boolean isSameYearMonth() {
         return YearMonth.from(start).equals(YearMonth.from(end));
     }
+
+    public int intervalDays() {
+        return java.time.Period.between(start, end).getDays() + 1;
+    }
 }
