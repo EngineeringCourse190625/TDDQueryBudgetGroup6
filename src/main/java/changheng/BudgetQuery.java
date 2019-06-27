@@ -26,20 +26,6 @@ public class BudgetQuery {
         return YearMonth.from(d).atDay(1);
     }
 
-    private Double getAmountOfPeriod(Period period, List<Budget> budgets) {
-        double total = 0;
-        for (Budget budget : budgets) {
-            if (isInPeriod(firstDay(period.getStart()), period.getEnd(), budget.firstDay())) {
-                total += budget.dailyAmount() * period.intervalDays();
-            }
-        }
-        return total;
-    }
-
-    private boolean isInPeriod(LocalDate from, LocalDate to, LocalDate d) {
-        return (d.isAfter(from) || d.isEqual(from)) && (d.isBefore(to) || d.isEqual(to));
-    }
-
     private LocalDate lastDay(LocalDate d) {
         return YearMonth.from(d).atEndOfMonth();
     }
@@ -67,9 +53,7 @@ public class BudgetQuery {
             }
 
             double total = 0;
-            if (isInPeriod(firstDay(overlappingPeriod.getStart()), overlappingPeriod.getEnd(), optionalBudget.get().firstDay())) {
-                total += optionalBudget.get().dailyAmount() * overlappingPeriod.intervalDays();
-            }
+            total += optionalBudget.get().dailyAmount() * overlappingPeriod.intervalDays();
             result += total;
         }
 
